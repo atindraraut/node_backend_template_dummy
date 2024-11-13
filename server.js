@@ -2,8 +2,9 @@ const express = require('express');
 const { setupDatabaseConnection } = require('./config/db');  // Import setupDatabaseConnection function
 require('dotenv').config();
 const { DataTypes } = require('sequelize')
-
+const cors = require('cors');
 const app = express();
+app.use(cors());
 app.use(express.json());
 let User = null;
 // Test DB connection and create tables if they don't exist

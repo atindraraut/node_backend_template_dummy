@@ -1,16 +1,21 @@
 const { Sequelize } = require('sequelize');
-const AWS = require('aws-sdk');
+const { SecretsManagerClient, GetSecretValueCommand } = require('@aws-sdk/client-secrets-manager');  // Import from AWS SDK v3
 require('dotenv').config();
 
-// Set up AWS Secrets Manager client
-const secretsManager = new AWS.SecretsManager({
+// Set up AWS Secrets Manager client (AWS SDK v3)
+const secretsManagerClient = new SecretsManagerClient({
   region: process.env.AWS_REGION || 'us-east-1', // Default to 'us-east-1' if AWS_REGION is not set
 });
 
-// Function to retrieve DB credentials from AWS Secrets Manager
+// Function to retrieve DB credentials from AWS Secrets Manager (AWS SDK v3)
 const getDbCredentials = async (secretName) => {
   try {
-    const data = await secretsManager.getSecretValue({ SecretId: secretName }).promise();
+    // Create the GetSecretValueCommand with the secret name
+    const command = new GetSecretValueCommand({ SecretId: secretName });
+    
+    // Send the command to Secrets Manager
+    const data = await secretsManagerClient.send(command);
+    
     if (data.SecretString) {
       const secret = JSON.parse(data.SecretString);  // Parse the secret JSON string
       return secret;
@@ -34,7 +39,8 @@ const setupDatabaseConnection = async () => {
   try {
     // Fetch the database credentials from Secrets Manager
     const dbCredentials = await getDbCredentials(secretName);
-    console.log(dbCredentials);
+    console.log(dbCredentials);  // Log the credentials to verify
+
     // Destructure the credentials from the secret
     const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT } = dbCredentials;
 
