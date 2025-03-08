@@ -46,7 +46,7 @@ const setupDatabaseConnection = async () => {
 
     // Set up Sequelize using the credentials retrieved from Secrets Manager
     const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-      host: DB_HOST,
+      host: DB_HOST.split(':')[0],
       port: DB_PORT,
       dialect: 'mysql',  // or 'postgres', 'sqlite', 'mssql', etc.
       logging: false,    // Optional: disable Sequelize logging
